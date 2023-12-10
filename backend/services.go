@@ -3,24 +3,26 @@ package main
 import (
 	"context"
 	"fmt"
+	"image/color"
 	"io"
 	"log"
-	"image/color"
 	"net/http"
 	"os"
 	"strings"
 	"sync"
 	"time"
-	"github.com/disintegration/imaging"
+
 	"github.com/dgrijalva/jwt-go"
+	"github.com/disintegration/imaging"
 	"github.com/gin-gonic/gin"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 )
+
 type User struct {
-	Email string `json:"email"`
-	Password  string `json:"password"`
+	Email    string `json:"email"`
+	Password string `json:"password"`
 }
 type userStack struct {
 	UndoStack    []*Image
@@ -30,15 +32,16 @@ type userStack struct {
 type Image struct {
 	Path string
 }
+
 var (
 	userStacks = make(map[string]*userStack)
-	mu sync.Mutex
-	client1 *mongo.Client
+	mu         sync.Mutex
+	client1    *mongo.Client
 )
 
-func connectDb(){
+func connectDb() {
 	clientOptions := options.Client().ApplyURI(os.Getenv("MONGO_URI"))
-	client,err := mongo.Connect(context.Background(), clientOptions)
+	client, err := mongo.Connect(context.Background(), clientOptions)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -93,7 +96,7 @@ func signup(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
-	insertRes,err := client1.Database("users").Collection("login_details").InsertOne(context.Background(),user)
+	insertRes, err := client1.Database("users").Collection("login_details").InsertOne(context.Background(), user)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -115,13 +118,13 @@ func login(c *gin.Context) {
 	fmt.Println(user.Email)
 	fmt.Println(result.Email)
 	if result.Password == user.Password {
-		tokenString,err:= createToken(&user);
+		tokenString, err := createToken(&user)
 		if err != nil {
 			fmt.Println("Error creating token:", err)
 			return
 		}
 		c.JSON(http.StatusOK, gin.H{"token": tokenString})
-	}else{
+	} else {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "password dont match"})
 	}
 }
@@ -133,51 +136,50 @@ func upload(c *gin.Context) {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to retrieve email from context"})
 		return
 	}
-	_,exist:= userStacks[email.(string)];
+	_, exist := userStacks[email.(string)]
 	if !exist {
 		userStacks[email.(string)] = &userStack{}
 		file, err := c.FormFile("file")
 		if err != nil {
 			c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 			return
-	 	}
+		}
 		err = c.SaveUploadedFile(file, "tempupload/"+file.Filename)
-		userStacks[email.(string)].CurrentImage = &Image{Path: "tempupload/"+file.Filename}
+		userStacks[email.(string)].CurrentImage = &Image{Path: "tempupload/" + file.Filename}
 		userStacks[email.(string)].UndoStack = []*Image{}
 		userStacks[email.(string)].RedoStack = []*Image{}
-     	if err != nil {
-        	c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
-        	return
-    	}
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+			return
+		}
 		c.JSON(http.StatusOK, gin.H{"message": "File uploaded successfully"})
-	}else{
+	} else {
 		ImagePath := userStacks[email.(string)].CurrentImage.Path
-		err:=os.Remove(ImagePath)
-		if err != nil{
-			fmt.Printf("Error removing %s",ImagePath)
-		}else{
+		err := os.Remove(ImagePath)
+		if err != nil {
+			fmt.Printf("Error removing %s", ImagePath)
+		} else {
 			file, err := c.FormFile("file")
 			if err != nil {
 				c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 				return
-	 			}
+			}
 			err = c.SaveUploadedFile(file, "tempupload/"+file.Filename)
-			userStacks[email.(string)].CurrentImage = &Image{Path: "tempupload/"+file.Filename}
+			userStacks[email.(string)].CurrentImage = &Image{Path: "tempupload/" + file.Filename}
 			userStacks[email.(string)].UndoStack = []*Image{}
 			userStacks[email.(string)].RedoStack = []*Image{}
-     		if err != nil {
-        		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
-        		return
-    		}
+			if err != nil {
+				c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+				return
+			}
 			c.JSON(http.StatusOK, gin.H{"message": "File uploaded successfully"})
 		}
 	}
 	defer mu.Unlock()
 }
 
-
 func undo(c *gin.Context) {
-	
+
 }
 func redo(c *gin.Context) {
 
@@ -189,26 +191,27 @@ func crop(c *gin.Context) {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to retrieve email from context"})
 		return
 	}
-	_,exist:= userStacks[email.(string)];
-	if exist{
-		diff:=&Image{Path: "awdawd"}
+	_, exist := userStacks[email.(string)]
+	if exist {
+		diff := &Image{Path: "awdawd"}
 		userStacks[email.(string)].UndoStack = append(userStacks[email.(string)].UndoStack, diff)
-	}else{
+	} else {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Upload a image first"})
 	}
 }
-// func imageCenter(img gocv.Mat) image.Point {
-// 	height, width := img.Size()[0], img.Size()[1]
-// 	return image.Pt(width/2, height/2)
-// }
-func rotate(c *gin.Context){
-	email,exists := c.Get("email")
+
+//	func imageCenter(img gocv.Mat) image.Point {
+//		height, width := img.Size()[0], img.Size()[1]
+//		return image.Pt(width/2, height/2)
+//	}
+func rotate(c *gin.Context) {
+	email, exists := c.Get("email")
 	if !exists {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to retrieve email from context"})
 		return
 	}
-	_,exist:= userStacks[email.(string)];
-	if exist{
+	_, exist := userStacks[email.(string)]
+	if exist {
 		imagePath := userStacks[email.(string)].CurrentImage.Path
 		file, err := os.Open(imagePath)
 		if err != nil {
@@ -223,21 +226,21 @@ func rotate(c *gin.Context){
 		if err != nil {
 			log.Fatal(err)
 		}
-		c.JSON(http.StatusOK,gin.H{"Success":"True"})
-	}else{
+		c.JSON(http.StatusOK, gin.H{"Success": "True"})
+	} else {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Upload a image first"})
 	}
 }
-func getImage(c *gin.Context){
-	email,exists := c.Get("email")
+func getImage(c *gin.Context) {
+	email, exists := c.Get("email")
 	if !exists {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to retrieve email from context"})
 		return
 	}
-	_,exist:= userStacks[email.(string)];
-	if exist{
+	_, exist := userStacks[email.(string)]
+	if exist {
 		imageFile, err := os.Open(userStacks[email.(string)].CurrentImage.Path)
-		extType:= strings.Split(userStacks[email.(string)].CurrentImage.Path, ".")[1]
+		extType := strings.Split(userStacks[email.(string)].CurrentImage.Path, ".")[1]
 		if err != nil {
 			c.JSON(http.StatusInternalServerError, gin.H{"error": "Error opening image file"})
 			return
@@ -250,7 +253,7 @@ func getImage(c *gin.Context){
 			c.JSON(http.StatusInternalServerError, gin.H{"error": "Error copying image to response"})
 			return
 		}
-	}else{
+	} else {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Upload a image first"})
 	}
 }
