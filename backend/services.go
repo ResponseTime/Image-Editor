@@ -200,10 +200,6 @@ func crop(c *gin.Context) {
 	}
 }
 
-//	func imageCenter(img gocv.Mat) image.Point {
-//		height, width := img.Size()[0], img.Size()[1]
-//		return image.Pt(width/2, height/2)
-//	}
 func rotate(c *gin.Context) {
 	email, exists := c.Get("email")
 	if !exists {
@@ -253,6 +249,45 @@ func getImage(c *gin.Context) {
 			c.JSON(http.StatusInternalServerError, gin.H{"error": "Error copying image to response"})
 			return
 		}
+	} else {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Upload a image first"})
+	}
+}
+func export(c *gin.Context) {
+	email, exists := c.Get("email")
+	if !exists {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to retrieve email from context"})
+		return
+	}
+	_, exist := userStacks[email.(string)]
+	if exist {
+		imageFile := userStacks[email.(string)].CurrentImage.Path
+		c.File(imageFile)
+	} else {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Upload a image first"})
+	}
+}
+
+func save(c *gin.Context) {
+	email, exists := c.Get("email")
+	if !exists {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to retrieve email from context"})
+		return
+	}
+	_, exist := userStacks[email.(string)]
+	if exist {
+		imageFile := userStacks[email.(string)].CurrentImage.Path
+		data := bson.M{
+			"ImagePath": imageFile,
+			"User":      email.(string),
+		}
+		insertRes, err := client1.Database("users").Collection("image_details").InsertOne(context.Background(), data)
+		if err != nil {
+			log.Fatal(err)
+		}
+		fmt.Printf("Inserted document with ID %v\n", insertRes.InsertedID)
+		c.JSON(http.StatusOK, gin.H{"success": insertRes.InsertedID})
+
 	} else {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Upload a image first"})
 	}

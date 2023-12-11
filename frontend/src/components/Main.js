@@ -23,23 +23,28 @@ export default function Main(props) {
       </div>
       <div className="sidebar">
         <h1 style={{ textAlign: "center" }}>
-          Hello {localStorage.getItem("Auth").substring(0,10)}
+          Hello {localStorage.getItem("Auth").substring(0, 10)}
         </h1>
         <div className="buttons">
           <button>CROP</button>
           <button>RESIZE</button>
-          <button>FILTER</button>
           <button>ROTATE</button>
-          <button>COLOR</button>
+          <button>GRAYSCALE</button>
+          <button>BLUR</button>
+          <button>BRIGHTNESS</button>
+          <button>SHARPENING</button>
+          <button>contrast</button>
         </div>
-        <div className="history">
-          <h1 style={{ backgroundColor: "black", textAlign: "center" }}>
-            History
-          </h1>
-          <div className="exp">
-            <button>Export</button>
-            <button>Save</button>
-          </div>
+        <h1
+          style={{
+            textAlign: "center",
+          }}>
+          History
+        </h1>
+        <div className="history"></div>
+        <div className="exp">
+          <button>Export</button>
+          <button>Save</button>
         </div>
       </div>
     </>
