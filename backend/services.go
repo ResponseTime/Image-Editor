@@ -262,7 +262,29 @@ func export(c *gin.Context) {
 	_, exist := userStacks[email.(string)]
 	if exist {
 		imageFile := userStacks[email.(string)].CurrentImage.Path
+		filename, extType := strings.Split(userStacks[email.(string)].CurrentImage.Path, "/")[1], strings.Split(userStacks[email.(string)].CurrentImage.Path, ".")[1]
+		c.Writer.Header().Set("Content-Disposition", fmt.Sprintf("attachment; filename=%s", filename))
+		c.Writer.Header().Set("filename", filename)
+		c.Writer.Header().Set("Content-Type", fmt.Sprintf("image/%s", extType))
 		c.File(imageFile)
+		// imageFile, err := os.Open(userStacks[email.(string)].CurrentImage.Path)
+		// filename, extType := strings.Split(userStacks[email.(string)].CurrentImage.Path, "/")[1], strings.Split(userStacks[email.(string)].CurrentImage.Path, ".")[1]
+		// fmt.Println(strings.Split(filename, ".")[0])
+		// if err != nil {
+		// 	c.JSON(http.StatusInternalServerError, gin.H{"error": "Error opening image file"})
+		// 	return
+		// }
+		// defer imageFile.Close()
+		// c.Header("Content-Disposition", fmt.Sprintf("attachment; filename=%s", strings.Split(filename, ".")[0]))
+		// c.Header("Content-Type", fmt.Sprintf("image/%s", extType))
+		// c.Header("Cache-Control", "no-store")
+		// c.Header("Pragma", "no-cache")
+		// _, err = io.Copy(c.Writer, imageFile)
+		// if err != nil {
+		// 	c.JSON(http.StatusInternalServerError, gin.H{"error": "Error copying image to response"})
+		// 	return
+		// }
+		// c.Writer.Flush()
 	} else {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Upload a image first"})
 	}

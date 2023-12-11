@@ -13,6 +13,9 @@ func setupRouter() *gin.Engine {
 	config.AllowOrigins = []string{"http://localhost:3000"}
 	config.AllowMethods = []string{"GET", "POST", "PUT", "DELETE"}
 	config.AllowHeaders = append(config.AllowHeaders, "Authorization")
+	config.AllowHeaders = append(config.AllowHeaders, "filename")
+	config.ExposeHeaders = append(config.ExposeHeaders, "filename")
+
 	router.Use(cors.New(config))
 	v1 := router.Group("/api/v1")
 	{

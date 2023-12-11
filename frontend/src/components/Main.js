@@ -1,7 +1,22 @@
 import React from "react";
 import GridLines from "react-gridlines";
 import { motion } from "framer-motion";
+import pako from "pako";
+import axios from "axios";
 export default function Main(props) {
+  const handleDownload = async () => {
+    const res = await axios.get("http://localhost:8080/api/v1/export", {
+      headers: { Authorization: localStorage.getItem("Auth") },
+      responseType: "blob",
+    });
+    const url = window.URL.createObjectURL(new Blob([res.data]));
+    const link = document.createElement("a");
+    link.setAttribute("download", res.headers.filename);
+    link.href = url;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
   return (
     <>
       <div className="editor">
@@ -43,7 +58,7 @@ export default function Main(props) {
         </h1>
         <div className="history"></div>
         <div className="exp">
-          <button>Export</button>
+          <button onClick={handleDownload}>Export</button>
           <button>Save</button>
         </div>
       </div>

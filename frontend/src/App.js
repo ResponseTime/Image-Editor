@@ -12,12 +12,12 @@ function App() {
     } else {
       setAuth(true);
     }
-  }, []);
+  }, [auth]);
   return (
     <BrowserRouter>
       <Routes>
         <Route path="/" element={auth ? <Main /> : <Navigate to="/login" />} />
-        <Route path="/upload" element={<Records/>} />
+        <Route path="/upload" element={<Records />} />
         <Route path="/login" element={<Auth />} />
         <Route path="/signup" element={<Auth title="signup" />} />
       </Routes>
