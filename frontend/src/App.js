@@ -16,8 +16,12 @@ function App() {
   return (
     <BrowserRouter>
       <Routes>
-        <Route path="/" element={auth ? <Main /> : <Navigate to="/login" />} />
-        <Route path="/upload" element={<Records />} />
+        <Route
+          path="/"
+          element={auth ? <Records /> : <Navigate to="/login" />}
+        />
+        <Route path="/main" element={<Main />} />
+        {/* <Route path="/upload" element={<Records />} /> */}
         <Route path="/login" element={<Auth />} />
         <Route path="/signup" element={<Auth title="signup" />} />
       </Routes>

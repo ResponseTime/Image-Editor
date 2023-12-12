@@ -292,6 +292,7 @@ func export(c *gin.Context) {
 
 func save(c *gin.Context) {
 	email, exists := c.Get("email")
+	pn := c.Param("pname")
 	if !exists {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to retrieve email from context"})
 		return
@@ -300,8 +301,9 @@ func save(c *gin.Context) {
 	if exist {
 		imageFile := userStacks[email.(string)].CurrentImage.Path
 		data := bson.M{
-			"ImagePath": imageFile,
-			"User":      email.(string),
+			"ImagePath":   imageFile,
+			"User":        email.(string),
+			"ProjectName": pn,
 		}
 		insertRes, err := client1.Database("users").Collection("image_details").InsertOne(context.Background(), data)
 		if err != nil {
@@ -313,4 +315,40 @@ func save(c *gin.Context) {
 	} else {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Upload a image first"})
 	}
+}
+
+func getDetails(c *gin.Context) {
+	email, exists := c.Get("email")
+	if !exists {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to retrieve email from context"})
+		return
+	}
+	filter := bson.M{"User": email}
+	var res []struct {
+		ImagePath   string
+		User        string
+		ProjectName string
+	}
+
+	cursor, err := client1.Database("users").Collection("image_details").Find(context.Background(), filter)
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer cursor.Close(context.Background())
+	for cursor.Next(context.Background()) {
+		var result struct {
+			ImagePath   string
+			User        string
+			ProjectName string
+		}
+		if err := cursor.Decode(&result); err != nil {
+			log.Fatal(err)
+		}
+		res = append(res, result)
+
+	}
+	if err := cursor.Err(); err != nil {
+		log.Fatal(err)
+	}
+	c.JSON(http.StatusOK, gin.H{"data": res})
 }

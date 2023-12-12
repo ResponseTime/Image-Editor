@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import GridLines from "react-gridlines";
 import { motion } from "framer-motion";
 import pako from "pako";
@@ -17,6 +17,18 @@ export default function Main(props) {
     link.click();
     document.body.removeChild(link);
   };
+  const [photo, setPhoto] = useState();
+  useEffect(() => {
+    const f1 = async () => {
+      const res = await axios.get("http://localhost:8080/api/v1/getImage", {
+        headers: { Authorization: localStorage.getItem("Auth") },
+        responseType: "blob",
+      });
+      const url = window.URL.createObjectURL(new Blob([res.data]));
+      setPhoto(url);
+    };
+    f1();
+  }, []);
   return (
     <>
       <div className="editor">
@@ -27,7 +39,7 @@ export default function Main(props) {
               maxHeight: "100%",
               maxWidth: "100%",
             }}
-            src="https://picsum.photos/500/500"
+            src={photo}
             alt=""
             drag
             dragTransition={{ bounceStiffness: 600, bounceDamping: 10 }}

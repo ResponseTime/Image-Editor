@@ -30,8 +30,9 @@ func setupRouter() *gin.Engine {
 		v1.POST("/color", authMiddleware)
 		v1.POST("/filter", authMiddleware)
 		v1.GET("/export", authMiddleware, export)
-		v1.GET("/save", authMiddleware, save)
+		v1.GET("/save/:pname", authMiddleware, save)
 		v1.GET("/getImage", authMiddleware, getImage)
+		v1.GET("/getdetails", authMiddleware, getDetails)
 	}
 	return router
 }
