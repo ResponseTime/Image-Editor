@@ -10,7 +10,6 @@ import (
 	"os"
 	"strings"
 	"sync"
-	"time"
 
 	"github.com/dgrijalva/jwt-go"
 	"github.com/disintegration/imaging"
@@ -52,7 +51,7 @@ func createToken(user *User) (string, error) {
 	token := jwt.New(jwt.SigningMethodHS256)
 	claims := token.Claims.(jwt.MapClaims)
 	claims["email"] = user.Email
-	claims["exp"] = time.Now().Add(time.Hour * 48).Unix()
+	// claims["exp"] = time.Now().Add(time.Minute * 5).Unix()
 	tokenString, err := token.SignedString([]byte(os.Getenv("SECRET_KEY")))
 	if err != nil {
 		return "", err

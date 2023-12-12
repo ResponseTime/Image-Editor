@@ -1,7 +1,13 @@
 import { useEffect, useState } from "react";
 import "./App.css";
 import Auth from "./components/Auth";
-import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
+import {
+  BrowserRouter,
+  Routes,
+  Route,
+  Navigate,
+  useNavigate,
+} from "react-router-dom";
 import Main from "./components/Main";
 import Records from "./components/Records";
 function App() {
