@@ -23,32 +23,43 @@ export default function Records(props) {
       navigate("/main");
     }
   };
-  const [data, setData] = useState();
+  const [data, setData] = useState(null);
   useEffect(() => {
     const fetchd = async () => {
-      const res = await axios.get("http://localhost:8080/api/v1/getdetails", {
-        headers: { Authorization: localStorage.getItem("Auth") },
-      });
-      const d = await res.data;
-      setData(d.data);
+      try {
+        const res = await axios.get("http://localhost:8080/api/v1/getdetails", {
+          headers: { Authorization: localStorage.getItem("Auth") },
+        });
+        const d = await res.data;
+        setData(d.data);
+      } catch (e) {
+        console.log(e);
+      }
     };
     fetchd();
   }, []);
+  const handleClick = () => {
+    navigate("/login");
+  };
   return (
     <>
+      <button onClick={handleClick}>Login</button>
       <div className="upload">
         <input name="file" type="file" onChange={handleUpload} />
       </div>
       <div className="records">
         <h1>Past Projects</h1>
-        {data &&
+        {data ? (
           data.map((val) => {
             return (
               <div key={val.ProjectName}>
                 <ImageHolder pname={val.ProjectName} username={val.User} />
               </div>
             );
-          })}
+          })
+        ) : (
+          <h1>Login to Edit Image</h1>
+        )}
       </div>
     </>
   );

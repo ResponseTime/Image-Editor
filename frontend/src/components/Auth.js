@@ -35,7 +35,11 @@ export default function Auth(props) {
       );
       const jwt = await res.data.token;
       localStorage.setItem("Auth", jwt);
-      navigate("/");
+      if (res.data) {
+        navigate("/");
+      } else {
+        setError(res.data.error);
+      }
     }
     if (props.title.toLowerCase() === "signup") {
       const postData = {
@@ -47,7 +51,7 @@ export default function Auth(props) {
         postData
       );
       if (res.data.success) {
-        navigate("/");
+        navigate("/login");
       } else {
         setError(res.data.error);
       }
