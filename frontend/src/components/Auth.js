@@ -29,16 +29,17 @@ export default function Auth(props) {
         email: email,
         password: pass,
       };
-      const res = await axios.post(
-        "http://localhost:8080/api/v1/login",
-        postData
-      );
-      const jwt = await res.data.token;
-      localStorage.setItem("Auth", jwt);
-      if (res.data) {
+      try {
+        const res = await axios.post(
+          "http://localhost:8080/api/v1/login",
+          postData
+        );
+
+        const jwt = await res.data.token;
+        localStorage.setItem("Auth", jwt);
         navigate("/");
-      } else {
-        setError(res.data.error);
+      } catch (e) {
+        setError(e.message);
       }
     }
     if (props.title.toLowerCase() === "signup") {

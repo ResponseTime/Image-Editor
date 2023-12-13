@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from "react";
 import GridLines from "react-gridlines";
 import { motion } from "framer-motion";
-import pako from "pako";
 import axios from "axios";
 export default function Main(props) {
   const handleDownload = async () => {
@@ -18,6 +17,20 @@ export default function Main(props) {
     document.body.removeChild(link);
   };
   const [photo, setPhoto] = useState();
+  const handleRotate = async () => {
+    const res = await axios.post(
+      "http://localhost:8080/api/v1/rotate",
+      {},
+      {
+        headers: { Authorization: localStorage.getItem("Auth") },
+      }
+    );
+    setHistory([
+      ...history,
+      "Image Rotated at" + new Date().toLocaleTimeString(),
+    ]);
+  };
+  const [history, setHistory] = useState([]);
   useEffect(() => {
     const f1 = async () => {
       const res = await axios.get("http://localhost:8080/api/v1/getImage", {
@@ -28,7 +41,7 @@ export default function Main(props) {
       setPhoto(url);
     };
     f1();
-  }, []);
+  }, [history]);
   return (
     <>
       <div className="editor">
@@ -48,31 +61,36 @@ export default function Main(props) {
           />
         </GridLines>
       </div>
+      <div className="buttons">
+        <button>CROP</button>
+        <button>RESIZE</button>
+        <button onClick={handleRotate}>ROTATE</button>
+        <button>GRAYSCALE</button>
+        <button>BLUR</button>
+        <button>BRIGHTNESS</button>
+        <button>SHARPENING</button>
+        <button>contrast</button>
+      </div>
       <div className="sidebar">
         <h1 style={{ textAlign: "center" }}>
           Hello {localStorage.getItem("Auth").substring(0, 10)}
         </h1>
-        <div className="buttons">
-          <button>CROP</button>
-          <button>RESIZE</button>
-          <button>ROTATE</button>
-          <button>GRAYSCALE</button>
-          <button>BLUR</button>
-          <button>BRIGHTNESS</button>
-          <button>SHARPENING</button>
-          <button>contrast</button>
-        </div>
+
         <h1
           style={{
             textAlign: "center",
           }}>
           History
         </h1>
-        <div className="history"></div>
-        <div className="exp">
-          <button onClick={handleDownload}>Export</button>
-          <button>Save</button>
+        <div className="history">
+          {history.map((Val, index) => {
+            return <span key={index}>{Val}</span>;
+          })}
         </div>
+      </div>
+      <div className="exp">
+        <button onClick={handleDownload}>Export</button>
+        <button>Save</button>
       </div>
     </>
   );

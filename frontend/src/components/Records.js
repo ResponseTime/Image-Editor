@@ -1,4 +1,4 @@
-import { react, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import ImageHolder from "./ImageHolder";
@@ -25,6 +25,12 @@ export default function Records(props) {
   };
   const [data, setData] = useState(null);
   useEffect(() => {
+    if (!localStorage.getItem("Auth")) {
+      navigate("/login");
+      return () => {};
+    }
+  }, []);
+  useEffect(() => {
     const fetchd = async () => {
       try {
         const res = await axios.get("http://localhost:8080/api/v1/getdetails", {
@@ -41,9 +47,17 @@ export default function Records(props) {
   const handleClick = () => {
     navigate("/login");
   };
+  const handleClickSign = () => {
+    navigate("/signup");
+  };
   return (
     <>
-      <button onClick={handleClick}>Login</button>
+      <button onClick={handleClick} className="btn-login">
+        Login
+      </button>
+      <button onClick={handleClickSign} className="btn-login">
+        Signup
+      </button>
       <div className="upload">
         <input name="file" type="file" onChange={handleUpload} />
       </div>
@@ -58,7 +72,7 @@ export default function Records(props) {
             );
           })
         ) : (
-          <h1>Login to Edit Image</h1>
+          <h1>No Past Projects</h1>
         )}
       </div>
     </>
