@@ -63,9 +63,9 @@ export default function Main(props) {
     ]);
   };
   useEffect(() => {
-    setTimeout(() => {
+    setInterval(() => {
       setUtils("");
-    }, 5000);
+    }, 20000);
   }, []);
   return (
     <>
@@ -111,7 +111,14 @@ export default function Main(props) {
               <button onClick={rotateLeft}>left</button>
             </div>
           ) : (
-            <h1></h1>
+            <>
+              <h1 style={{ textAlign: "center" }}>ImageCraft</h1>
+              <img
+                style={{ objectFit: "cover", height: "100%", width: "100%" }}
+                src="https://static-gcp.freepikcompany.com/web-app/media/wepik-2-2000.webp"
+                alt=""
+              />
+            </>
           )}
         </div>
         <div className="history">
