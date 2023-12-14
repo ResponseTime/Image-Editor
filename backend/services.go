@@ -226,6 +226,33 @@ func rotate(c *gin.Context) {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Upload a image first"})
 	}
 }
+func rotateR(c *gin.Context) {
+	email, exists := c.Get("email")
+	if !exists {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to retrieve email from context"})
+		return
+	}
+	_, exist := userStacks[email.(string)]
+	if exist {
+		imagePath := userStacks[email.(string)].CurrentImage.Path
+		file, err := os.Open(imagePath)
+		if err != nil {
+			log.Fatal(err)
+		}
+		img, err := imaging.Decode(file)
+		if err != nil {
+			log.Fatal(err)
+		}
+		rotatedImg := imaging.Rotate(img, -90, color.Transparent)
+		err = imaging.Save(rotatedImg, imagePath)
+		if err != nil {
+			log.Fatal(err)
+		}
+		c.JSON(http.StatusOK, gin.H{"Success": "True"})
+	} else {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Upload a image first"})
+	}
+}
 func getImage(c *gin.Context) {
 	email, exists := c.Get("email")
 	if !exists {

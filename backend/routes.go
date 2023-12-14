@@ -27,6 +27,7 @@ func setupRouter() *gin.Engine {
 		v1.POST("/crop", authMiddleware, crop)
 		v1.POST("/resize", authMiddleware)
 		v1.POST("/rotate", authMiddleware, rotate)
+		v1.POST("/rotater", authMiddleware, rotateR)
 		v1.POST("/color", authMiddleware)
 		v1.POST("/filter", authMiddleware)
 		v1.GET("/export", authMiddleware, export)

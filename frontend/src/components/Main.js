@@ -18,18 +18,12 @@ export default function Main(props) {
   };
   const [photo, setPhoto] = useState();
   const handleRotate = async () => {
-    const res = await axios.post(
-      "http://localhost:8080/api/v1/rotate",
-      {},
-      {
-        headers: { Authorization: localStorage.getItem("Auth") },
-      }
-    );
-    setHistory([
-      ...history,
-      "Image Rotated at" + new Date().toLocaleTimeString(),
-    ]);
+    setUtils("rotate");
   };
+  const handleCrop = async () => {
+    setUtils("crop");
+  };
+  const [util, setUtils] = useState("");
   const [history, setHistory] = useState([]);
   useEffect(() => {
     const f1 = async () => {
@@ -42,6 +36,37 @@ export default function Main(props) {
     };
     f1();
   }, [history]);
+  const rotateLeft = async () => {
+    const res = await axios.post(
+      "http://localhost:8080/api/v1/rotate",
+      {},
+      {
+        headers: { Authorization: localStorage.getItem("Auth") },
+      }
+    );
+    setHistory([
+      ...history,
+      "Image Rotated Left at " + new Date().toLocaleTimeString(),
+    ]);
+  };
+  const rotateRight = async () => {
+    const res = await axios.post(
+      "http://localhost:8080/api/v1/rotater",
+      {},
+      {
+        headers: { Authorization: localStorage.getItem("Auth") },
+      }
+    );
+    setHistory([
+      ...history,
+      "Image Rotated Right at " + new Date().toLocaleTimeString(),
+    ]);
+  };
+  useEffect(() => {
+    setTimeout(() => {
+      setUtils("");
+    }, 5000);
+  }, []);
   return (
     <>
       <div className="editor">
@@ -54,6 +79,7 @@ export default function Main(props) {
             }}
             src={photo}
             alt=""
+            initial={{ x: 400, y: 400 }}
             drag
             dragTransition={{ bounceStiffness: 600, bounceDamping: 10 }}
             whileTap={{ boxShadow: "0px 0px 15px rgba(0,0,0,0.2)" }}
@@ -62,7 +88,7 @@ export default function Main(props) {
         </GridLines>
       </div>
       <div className="buttons">
-        <button>CROP</button>
+        <button onClick={handleCrop}>CROP</button>
         <button>RESIZE</button>
         <button onClick={handleRotate}>ROTATE</button>
         <button>GRAYSCALE</button>
@@ -72,17 +98,29 @@ export default function Main(props) {
         <button>contrast</button>
       </div>
       <div className="sidebar">
-        <h1 style={{ textAlign: "center" }}>
-          Hello {localStorage.getItem("Auth").substring(0, 10)}
-        </h1>
-
-        <h1
-          style={{
-            textAlign: "center",
-          }}>
-          History
-        </h1>
+        <div className="utildump">
+          {util === "crop" ? (
+            <div className="crop">
+              <button>3:2</button>
+              <button>10:9</button>
+              <button>16:9</button>
+            </div>
+          ) : util === "rotate" ? (
+            <div className="rot">
+              <button onClick={rotateRight}>right</button>
+              <button onClick={rotateLeft}>left</button>
+            </div>
+          ) : (
+            <h1></h1>
+          )}
+        </div>
         <div className="history">
+          <h1
+            style={{
+              textAlign: "center",
+            }}>
+            History
+          </h1>
           {history.map((Val, index) => {
             return <span key={index}>{Val}</span>;
           })}
