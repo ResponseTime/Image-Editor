@@ -5,7 +5,8 @@
     overflow: hidden;
 }
 body{
-    background-color: #03111c;
+    background-color: #6554AF;
+    background-image: linear-gradient(to bottom, #6554af, #6e51a0, #724f92, #744e84, #724e78);
     color: white;
 }
 .form{
@@ -100,7 +101,8 @@ body{
     position: absolute;
     top: 0;
     right:0;
-    background-color: #03111c;
+    background-color: #6554AF;
+    background-image: linear-gradient(to bottom, #6554af, #6e51a0, #724f92, #744e84, #724e78);
     float: right;
     
 }
@@ -109,13 +111,12 @@ body{
     justify-content: flex-start;
     align-items: center;
     row-gap: 0px;
-    height: 9%;
+    height: 8.5%;
     position: absolute;
     top: 0;
     left: 0;
     width: 85%;
-    column-gap: -10px;
-    background-color: #0f0f0f;
+    background-color: #6554AF;
 }
 
 .exp{
@@ -130,9 +131,8 @@ body{
     height: 70%;
     width: 100%;
     position: absolute;
-    bottom: 0%;
+    bottom: 5%;
     right: 0;
-    background-color: rgb(9, 9, 9);
     overflow-y:auto
 }
 .history > span{
@@ -174,7 +174,7 @@ input[type="file"]::file-selector-button:hover {
 .ImageHolder{
     display: flex;
     margin:5px 0px;
-    border-left: 1px solid rgb(84, 25, 193);
+    border-left: 5px solid rgb(15, 3, 37);
     width: 30%;
     height: 100px;
     justify-content: space-evenly;
@@ -268,4 +268,41 @@ input[type="file"]::file-selector-button:hover {
     transition: 1s;
     cursor: pointer;
     margin: 5px 10px;
+}
+.save>button{
+    width: 60%; 
+    height: 60px; 
+    box-sizing: border-box; 
+    border: 2px solid #6c5ce7;
+    border-radius: 0.6em;
+    background-color: #a29bfe;
+    transition: 1s;
+    cursor: pointer;
+    margin: 5px auto;
+}
+.save>input[type=text]{
+    padding: 10px 10px;
+}
+.save{
+    display: flex;
+    flex-flow: column wrap;
+    align-items: center;
+    justify-content: center;
+}
+.exit{
+    position: absolute;
+    bottom: 0;
+    right: 0px;
+    width: 15%; 
+    height: 50px; 
+    box-sizing: border-box; 
+    border: 2px solid #6c5ce7;
+    background-color: #a29bfe;
+    transition: 1s;
+    cursor: pointer;
+}
+
+button:hover {
+    background-color: #81ecec;
+    border: 2px solid #00cec9;
 }

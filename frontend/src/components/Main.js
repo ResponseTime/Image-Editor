@@ -2,7 +2,9 @@ import React, { useEffect, useState } from "react";
 import GridLines from "react-gridlines";
 import { motion } from "framer-motion";
 import axios from "axios";
+import { useNavigate } from "react-router-dom";
 export default function Main(props) {
+  const navigate = useNavigate();
   const handleDownload = async () => {
     const res = await axios.get("http://localhost:8080/api/v1/export", {
       headers: { Authorization: localStorage.getItem("Auth") },
@@ -19,6 +21,10 @@ export default function Main(props) {
   const [photo, setPhoto] = useState();
   const handleRotate = async () => {
     setUtils("rotate");
+  };
+  const [saveText, setSaveText] = useState("");
+  const saveCall = () => {
+    setUtils("save");
   };
   const handleCrop = async () => {
     setUtils("crop");
@@ -62,30 +68,46 @@ export default function Main(props) {
       "Image Rotated Right at " + new Date().toLocaleTimeString(),
     ]);
   };
+  const handleExit = () => {
+    localStorage.removeItem("Auth");
+    navigate("/");
+  };
   useEffect(() => {
     setInterval(() => {
       setUtils("");
-    }, 20000);
+    }, 50000);
   }, []);
+  const handleSave = async () => {
+    const res = await axios.get(
+      `http://localhost:8080/api/v1/save/${saveText}`,
+      {
+        headers: { Authorization: localStorage.getItem("Auth") },
+      }
+    );
+    setHistory([
+      ...history,
+      `${saveText} Saved at ${new Date().toLocaleTimeString()}`,
+    ]);
+  };
   return (
     <>
       <div className="editor">
-        <GridLines className="editor" cellWidth={400} cellWidth2={200}>
-          <motion.img
-            style={{
-              objectFit: "contain",
-              maxHeight: "100%",
-              maxWidth: "100%",
-            }}
-            src={photo}
-            alt=""
-            initial={{ x: 400, y: 400 }}
-            drag
-            dragTransition={{ bounceStiffness: 600, bounceDamping: 10 }}
-            whileTap={{ boxShadow: "0px 0px 15px rgba(0,0,0,0.2)" }}
-            dragElastic={0.1}
-          />
-        </GridLines>
+        {/* <GridLines className="editor" cellWidth={40} cellWidth2={40}> */}
+        <motion.img
+          style={{
+            objectFit: "contain",
+            maxHeight: "100%",
+            maxWidth: "100%",
+          }}
+          src={photo}
+          alt=""
+          initial={{ x: 400, y: 400 }}
+          drag
+          dragTransition={{ bounceStiffness: 600, bounceDamping: 10 }}
+          whileTap={{ boxShadow: "0px 0px 15px rgba(0,0,0,0.2)" }}
+          dragElastic={0.1}
+        />
+        {/* </GridLines> */}
       </div>
       <div className="buttons">
         <button onClick={handleCrop}>CROP</button>
@@ -110,15 +132,26 @@ export default function Main(props) {
               <button onClick={rotateRight}>right</button>
               <button onClick={rotateLeft}>left</button>
             </div>
-          ) : (
+          ) : util === "" ? (
             <>
               <h1 style={{ textAlign: "center" }}>ImageCraft</h1>
               <img
-                style={{ objectFit: "cover", height: "100%", width: "100%" }}
+                style={{ objectFit: "cover", height: "200px", width: "100%" }}
                 src="https://static-gcp.freepikcompany.com/web-app/media/wepik-2-2000.webp"
                 alt=""
               />
             </>
+          ) : (
+            <div className="save">
+              <input
+                type="text"
+                value={saveText}
+                onChange={(e) => {
+                  setSaveText(e.target.value);
+                }}
+              />
+              <button onClick={handleSave}>Save Project</button>
+            </div>
           )}
         </div>
         <div className="history">
@@ -133,9 +166,12 @@ export default function Main(props) {
           })}
         </div>
       </div>
+      <button className="exit" onClick={handleExit}>
+        Exit and Logout
+      </button>
       <div className="exp">
         <button onClick={handleDownload}>Export</button>
-        <button>Save</button>
+        <button onClick={saveCall}>Save</button>
       </div>
     </>
   );
