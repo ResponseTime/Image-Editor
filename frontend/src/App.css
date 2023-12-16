@@ -167,9 +167,10 @@ input[type="file"]::file-selector-button:hover {
 } */
 .records{
     width: 100%;
-    height: 100vh;
+    height: 90vh;
     padding:20px 20px;
     /* background-color: #4F4A45 */
+    overflow-y: auto;
 }
 .ImageHolder{
     display: flex;

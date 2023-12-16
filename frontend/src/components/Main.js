@@ -77,6 +77,24 @@ export default function Main(props) {
       setUtils("");
     }, 50000);
   }, []);
+  const handleBlur = async () => {
+    const res = await axios.get("http://localhost:8080/api/v1/blurinc", {
+      headers: { Authorization: localStorage.getItem("Auth") },
+    });
+    setHistory([
+      ...history,
+      "Image Blured At " + new Date().toLocaleTimeString(),
+    ]);
+  };
+  const handleSharp = async () => {
+    const res = await axios.get("http://localhost:8080/api/v1/sharpinc", {
+      headers: { Authorization: localStorage.getItem("Auth") },
+    });
+    setHistory([
+      ...history,
+      "Image Sharpend at " + new Date().toLocaleTimeString(),
+    ]);
+  };
   const handleSave = async () => {
     const res = await axios.get(
       `http://localhost:8080/api/v1/save/${saveText}`,
@@ -89,59 +107,122 @@ export default function Main(props) {
       `${saveText} Saved at ${new Date().toLocaleTimeString()}`,
     ]);
   };
+  const handleResize = () => {
+    setUtils("resize");
+  };
+  const handleGrayscale = async () => {
+    const res = await axios.get(`http://localhost:8080/api/v1/grayscale`, {
+      headers: { Authorization: localStorage.getItem("Auth") },
+    });
+    setHistory([
+      ...history,
+      `Image Grayscaled at ${new Date().toLocaleTimeString()}`,
+    ]);
+  };
+  const handleBrightUp = async () => {
+    const res = await axios.get(`http://localhost:8080/api/v1/brightinc`, {
+      headers: { Authorization: localStorage.getItem("Auth") },
+    });
+    setHistory([
+      ...history,
+      `Brigtness Increased At ${new Date().toLocaleTimeString()}`,
+    ]);
+  };
+  const handleBrightDown = async () => {
+    const res = await axios.get(`http://localhost:8080/api/v1/brightdec`, {
+      headers: { Authorization: localStorage.getItem("Auth") },
+    });
+    setHistory([
+      ...history,
+      `Brigtness Decreased At ${new Date().toLocaleTimeString()}`,
+    ]);
+  };
+  const handleContrastUp = async () => {
+    const res = await axios.get(`http://localhost:8080/api/v1/contrastinc`, {
+      headers: { Authorization: localStorage.getItem("Auth") },
+    });
+    setHistory([
+      ...history,
+      `Contrast Increased At ${new Date().toLocaleTimeString()}`,
+    ]);
+  };
+  const handleContrastDown = async () => {
+    const res = await axios.get(`http://localhost:8080/api/v1/contrastdec`, {
+      headers: { Authorization: localStorage.getItem("Auth") },
+    });
+    setHistory([
+      ...history,
+      `Contrast Decreased At ${new Date().toLocaleTimeString()}`,
+    ]);
+  };
   return (
     <>
       <div className="editor">
-        {/* <GridLines className="editor" cellWidth={40} cellWidth2={40}> */}
-        <motion.img
-          style={{
-            objectFit: "contain",
-            maxHeight: "100%",
-            maxWidth: "100%",
-          }}
-          src={photo}
-          alt=""
-          initial={{ x: 400, y: 400 }}
-          drag
-          dragTransition={{ bounceStiffness: 600, bounceDamping: 10 }}
-          whileTap={{ boxShadow: "0px 0px 15px rgba(0,0,0,0.2)" }}
-          dragElastic={0.1}
-        />
-        {/* </GridLines> */}
+        <GridLines className="editor" cellWidth={400} cellWidth2={200}>
+          <motion.img
+            style={{
+              objectFit: "contain",
+              maxHeight: "100%",
+              maxWidth: "100%",
+            }}
+            src={photo}
+            alt=""
+            initial={{ x: 400, y: 400 }}
+            drag
+            dragTransition={{ bounceStiffness: 600, bounceDamping: 10 }}
+            whileTap={{ boxShadow: "0px 0px 15px rgba(0,0,0,0.2)" }}
+            dragElastic={0.1}
+          />
+        </GridLines>
       </div>
       <div className="buttons">
         <button onClick={handleCrop}>CROP</button>
-        <button>RESIZE</button>
+        <button onClick={handleResize}>RESIZE</button>
         <button onClick={handleRotate}>ROTATE</button>
-        <button>GRAYSCALE</button>
-        <button>BLUR</button>
-        <button>BRIGHTNESS</button>
-        <button>SHARPENING</button>
-        <button>contrast</button>
+        <button onClick={handleGrayscale}>GRAYSCALE</button>
+        <button onClick={handleBlur}>BLUR</button>
+        <button onClick={handleSharp}>SHARPENING</button>
+        <button
+          onClick={() => {
+            setUtils("bright");
+          }}>
+          BRIGHTNESS
+        </button>
+        <button
+          onClick={() => {
+            setUtils("contrast");
+          }}>
+          contrast
+        </button>
       </div>
       <div className="sidebar">
         <div className="utildump">
-          {util === "crop" ? (
+          {util === "crop" && (
             <div className="crop">
               <button>3:2</button>
               <button>10:9</button>
               <button>16:9</button>
             </div>
-          ) : util === "rotate" ? (
+          )}
+
+          {util === "rotate" && (
             <div className="rot">
               <button onClick={rotateRight}>right</button>
               <button onClick={rotateLeft}>left</button>
             </div>
-          ) : util === "" ? (
+          )}
+
+          {util === "" && (
             <>
               <h1 style={{ textAlign: "center" }}>ImageCraft</h1>
               <img
                 style={{ objectFit: "cover", height: "200px", width: "100%" }}
-                src="https://static-gcp.freepikcompany.com/web-app/media/wepik-2-2000.webp"
+                src="https://static-gcp.freepikcompany.com/web-app/media/wepik-1-2000.webp"
                 alt=""
               />
             </>
-          ) : (
+          )}
+          {util === "save" && (
             <div className="save">
               <input
                 type="text"
@@ -151,6 +232,25 @@ export default function Main(props) {
                 }}
               />
               <button onClick={handleSave}>Save Project</button>
+            </div>
+          )}
+          {util === "resize" && (
+            <div className="crop">
+              <button>800X400</button>
+              <button>1920X1080</button>
+              <button>1280x1024</button>
+            </div>
+          )}
+          {util === "bright" && (
+            <div className="crop">
+              <button onClick={handleBrightUp}>Increase Brightness</button>
+              <button onClick={handleBrightDown}>Decrease Brightness</button>
+            </div>
+          )}
+          {util === "contrast" && (
+            <div className="crop">
+              <button onClick={handleContrastUp}>Increase Contrast</button>
+              <button onClick={handleContrastDown}>Decrease Contrast</button>
             </div>
           )}
         </div>
