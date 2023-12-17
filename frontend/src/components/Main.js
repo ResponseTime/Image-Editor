@@ -155,6 +155,60 @@ export default function Main(props) {
       `Contrast Decreased At ${new Date().toLocaleTimeString()}`,
     ]);
   };
+  const re1 = async () => {
+    const res = await axios.get(`http://localhost:8080/api/v1/re1`, {
+      headers: { Authorization: localStorage.getItem("Auth") },
+    });
+    setHistory([
+      ...history,
+      `Image Resized At ${new Date().toLocaleTimeString()}`,
+    ]);
+  };
+  const re2 = async () => {
+    const res = await axios.get(`http://localhost:8080/api/v1/re2`, {
+      headers: { Authorization: localStorage.getItem("Auth") },
+    });
+    setHistory([
+      ...history,
+      `Image Resized At ${new Date().toLocaleTimeString()}`,
+    ]);
+  };
+  const re3 = async () => {
+    const res = await axios.get(`http://localhost:8080/api/v1/re3`, {
+      headers: { Authorization: localStorage.getItem("Auth") },
+    });
+    setHistory([
+      ...history,
+      `Image Resized At ${new Date().toLocaleTimeString()}`,
+    ]);
+  };
+  const c1 = async () => {
+    const res = await axios.get(`http://localhost:8080/api/v1/c1`, {
+      headers: { Authorization: localStorage.getItem("Auth") },
+    });
+    setHistory([
+      ...history,
+      `Image Cropped At ${new Date().toLocaleTimeString()}`,
+    ]);
+  };
+  const c2 = async () => {
+    const res = await axios.get(`http://localhost:8080/api/v1/c2`, {
+      headers: { Authorization: localStorage.getItem("Auth") },
+    });
+    setHistory([
+      ...history,
+      `Image Cropped At ${new Date().toLocaleTimeString()}`,
+    ]);
+  };
+  const c3 = async () => {
+    const res = await axios.get(`http://localhost:8080/api/v1/c3`, {
+      headers: { Authorization: localStorage.getItem("Auth") },
+    });
+    setHistory([
+      ...history,
+      `Image Cropped At ${new Date().toLocaleTimeString()}`,
+    ]);
+  };
   return (
     <>
       <div className="editor">
@@ -199,9 +253,9 @@ export default function Main(props) {
         <div className="utildump">
           {util === "crop" && (
             <div className="crop">
-              <button>3:2</button>
-              <button>10:9</button>
-              <button>16:9</button>
+              <button onClick={c1}>3:2</button>
+              <button onClick={c2}>10:9</button>
+              <button onClick={c3}>16:9</button>
             </div>
           )}
 
@@ -236,9 +290,9 @@ export default function Main(props) {
           )}
           {util === "resize" && (
             <div className="crop">
-              <button>800X400</button>
-              <button>1920X1080</button>
-              <button>1280x1024</button>
+              <button onClick={re1}>800X400</button>
+              <button onClick={re2}>1920X1080</button>
+              <button onClick={re3}>1280x1024</button>
             </div>
           )}
           {util === "bright" && (

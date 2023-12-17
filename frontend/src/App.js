@@ -6,7 +6,7 @@ import Main from "./components/Main";
 import Records from "./components/Records";
 function App() {
   return (
-    <BrowserRouter>
+	<BrowserRouter>
       <Routes>
         <Route path="/" element={<Records />} />
         <Route path="/main" element={<Main />} />

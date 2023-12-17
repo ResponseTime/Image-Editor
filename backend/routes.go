@@ -41,6 +41,12 @@ func setupRouter() *gin.Engine {
 		v1.GET("/save/:pname", authMiddleware, save)
 		v1.GET("/getImage", authMiddleware, getImage)
 		v1.GET("/getdetails", authMiddleware, getDetails)
+		v1.GET("/re1", authMiddleware, resize1)
+		v1.GET("/re2", authMiddleware, resize2)
+		v1.GET("/re3", authMiddleware, resize3)
+		v1.GET("/c1", authMiddleware, crop1)
+		v1.GET("/c2", authMiddleware, crop2)
+		v1.GET("/c3", authMiddleware, crop3)
 	}
 	return router
 }

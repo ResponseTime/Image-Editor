@@ -18,8 +18,7 @@ export default function Records(props) {
         },
       }
     );
-    if (res.data.message) {
-      console.log("uploaded");
+    if (res.status === 200) {
       navigate("/main");
     }
   };

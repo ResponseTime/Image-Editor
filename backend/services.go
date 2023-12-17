@@ -143,8 +143,8 @@ func upload(c *gin.Context) {
 			c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 			return
 		}
-		err = c.SaveUploadedFile(file, "tempupload/"+file.Filename)
-		userStacks[email.(string)].CurrentImage = &Image{Path: "tempupload/" + file.Filename}
+		err = c.SaveUploadedFile(file, "D:\\Software Projects\\Image-Editor\\backend\\tempupload\\"+file.Filename)
+		userStacks[email.(string)].CurrentImage = &Image{Path: "D:\\Software Projects\\Image-Editor\\backend\\tempupload\\" + file.Filename}
 		userStacks[email.(string)].UndoStack = []*Image{}
 		userStacks[email.(string)].RedoStack = []*Image{}
 		if err != nil {
@@ -163,8 +163,8 @@ func upload(c *gin.Context) {
 				c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 				return
 			}
-			err = c.SaveUploadedFile(file, "tempupload/"+file.Filename)
-			userStacks[email.(string)].CurrentImage = &Image{Path: "tempupload/" + file.Filename}
+			err = c.SaveUploadedFile(file, "D:\\Software Projects\\Image-Editor\\backend\\tempupload\\"+file.Filename)
+			userStacks[email.(string)].CurrentImage = &Image{Path: "D:\\Software Projects\\Image-Editor\\backend\\tempupload\\" + file.Filename}
 			userStacks[email.(string)].UndoStack = []*Image{}
 			userStacks[email.(string)].RedoStack = []*Image{}
 			if err != nil {
@@ -222,6 +222,7 @@ func rotate(c *gin.Context) {
 			log.Fatal(err)
 		}
 		c.JSON(http.StatusOK, gin.H{"Success": "True"})
+		file.Close()
 	} else {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Upload a image first"})
 	}
@@ -249,6 +250,7 @@ func rotateR(c *gin.Context) {
 			log.Fatal(err)
 		}
 		c.JSON(http.StatusOK, gin.H{"Success": "True"})
+		file.Close()
 	} else {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Upload a image first"})
 	}
@@ -267,7 +269,6 @@ func getImage(c *gin.Context) {
 			c.JSON(http.StatusInternalServerError, gin.H{"error": "Error opening image file"})
 			return
 		}
-		defer imageFile.Close()
 		c.Header("Content-Type", fmt.Sprintf("image/%s", extType))
 		c.Header("Content-Disposition", fmt.Sprintf("inline; filename=%s", userStacks[email.(string)].CurrentImage.Path))
 		_, err = io.Copy(c.Writer, imageFile)
@@ -275,6 +276,7 @@ func getImage(c *gin.Context) {
 			c.JSON(http.StatusInternalServerError, gin.H{"error": "Error copying image to response"})
 			return
 		}
+		imageFile.Close()
 	} else {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Upload a image first"})
 	}
@@ -402,6 +404,7 @@ func blurinc(c *gin.Context) {
 			log.Fatal(err)
 		}
 		c.JSON(http.StatusOK, gin.H{"Success": "True"})
+		file.Close()
 	} else {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Upload a image first"})
 	}
@@ -429,6 +432,7 @@ func brightinc(c *gin.Context) {
 			log.Fatal(err)
 		}
 		c.JSON(http.StatusOK, gin.H{"Success": "True"})
+		file.Close()
 	} else {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Upload a image first"})
 	}
@@ -456,6 +460,7 @@ func brightdec(c *gin.Context) {
 			log.Fatal(err)
 		}
 		c.JSON(http.StatusOK, gin.H{"Success": "True"})
+		file.Close()
 	} else {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Upload a image first"})
 	}
@@ -483,6 +488,7 @@ func contrasinc(c *gin.Context) {
 			log.Fatal(err)
 		}
 		c.JSON(http.StatusOK, gin.H{"Success": "True"})
+		file.Close()
 	} else {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Upload a image first"})
 	}
@@ -510,6 +516,7 @@ func contrasdec(c *gin.Context) {
 			log.Fatal(err)
 		}
 		c.JSON(http.StatusOK, gin.H{"Success": "True"})
+		file.Close()
 	} else {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Upload a image first"})
 	}
@@ -537,6 +544,7 @@ func grayscale(c *gin.Context) {
 			log.Fatal(err)
 		}
 		c.JSON(http.StatusOK, gin.H{"Success": "True"})
+		file.Close()
 	} else {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Upload a image first"})
 	}
@@ -564,6 +572,175 @@ func sharpinc(c *gin.Context) {
 			log.Fatal(err)
 		}
 		c.JSON(http.StatusOK, gin.H{"Success": "True"})
+		file.Close()
+	} else {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Upload a image first"})
+	}
+}
+func resize1(c *gin.Context) {
+	email, exists := c.Get("email")
+	if !exists {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to retrieve email from context"})
+		return
+	}
+	_, exist := userStacks[email.(string)]
+	if exist {
+		imagePath := userStacks[email.(string)].CurrentImage.Path
+		file, err := os.Open(imagePath)
+		if err != nil {
+			log.Fatal(err)
+		}
+		img, err := imaging.Decode(file)
+		if err != nil {
+			log.Fatal(err)
+		}
+		resImg := imaging.Resize(img, 800, 400, imaging.Lanczos)
+		err = imaging.Save(resImg, imagePath)
+		if err != nil {
+			log.Fatal(err)
+		}
+		c.JSON(http.StatusOK, gin.H{"Success": "True"})
+		file.Close()
+	} else {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Upload a image first"})
+	}
+}
+func resize2(c *gin.Context) {
+	email, exists := c.Get("email")
+	if !exists {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to retrieve email from context"})
+		return
+	}
+	_, exist := userStacks[email.(string)]
+	if exist {
+		imagePath := userStacks[email.(string)].CurrentImage.Path
+		file, err := os.Open(imagePath)
+		if err != nil {
+			log.Fatal(err)
+		}
+		img, err := imaging.Decode(file)
+		if err != nil {
+			log.Fatal(err)
+		}
+		resImg := imaging.Resize(img, 1920, 1080, imaging.Lanczos)
+		err = imaging.Save(resImg, imagePath)
+		if err != nil {
+			log.Fatal(err)
+		}
+		c.JSON(http.StatusOK, gin.H{"Success": "True"})
+		file.Close()
+	} else {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Upload a image first"})
+	}
+}
+func resize3(c *gin.Context) {
+	email, exists := c.Get("email")
+	if !exists {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to retrieve email from context"})
+		return
+	}
+	_, exist := userStacks[email.(string)]
+	if exist {
+		imagePath := userStacks[email.(string)].CurrentImage.Path
+		file, err := os.Open(imagePath)
+		if err != nil {
+			log.Fatal(err)
+		}
+		img, err := imaging.Decode(file)
+		if err != nil {
+			log.Fatal(err)
+		}
+		resImg := imaging.Resize(img, 1280, 1024, imaging.Lanczos)
+		err = imaging.Save(resImg, imagePath)
+		if err != nil {
+			log.Fatal(err)
+		}
+		c.JSON(http.StatusOK, gin.H{"Success": "True"})
+		file.Close()
+	} else {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Upload a image first"})
+	}
+}
+func crop1(c *gin.Context) {
+	email, exists := c.Get("email")
+	if !exists {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to retrieve email from context"})
+		return
+	}
+	_, exist := userStacks[email.(string)]
+	if exist {
+		imagePath := userStacks[email.(string)].CurrentImage.Path
+		file, err := os.Open(imagePath)
+		if err != nil {
+			log.Fatal(err)
+		}
+		img, err := imaging.Decode(file)
+		if err != nil {
+			log.Fatal(err)
+		}
+		resImg := imaging.CropCenter(img, 300, 200)
+		err = imaging.Save(resImg, imagePath)
+		if err != nil {
+			log.Fatal(err)
+		}
+		c.JSON(http.StatusOK, gin.H{"Success": "True"})
+		file.Close()
+	} else {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Upload a image first"})
+	}
+}
+func crop2(c *gin.Context) {
+	email, exists := c.Get("email")
+	if !exists {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to retrieve email from context"})
+		return
+	}
+	_, exist := userStacks[email.(string)]
+	if exist {
+		imagePath := userStacks[email.(string)].CurrentImage.Path
+		file, err := os.Open(imagePath)
+		if err != nil {
+			log.Fatal(err)
+		}
+		img, err := imaging.Decode(file)
+		if err != nil {
+			log.Fatal(err)
+		}
+		resImg := imaging.CropCenter(img, 1000, 900)
+		err = imaging.Save(resImg, imagePath)
+		if err != nil {
+			log.Fatal(err)
+		}
+		c.JSON(http.StatusOK, gin.H{"Success": "True"})
+		file.Close()
+	} else {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Upload a image first"})
+	}
+}
+func crop3(c *gin.Context) {
+	email, exists := c.Get("email")
+	if !exists {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to retrieve email from context"})
+		return
+	}
+	_, exist := userStacks[email.(string)]
+	if exist {
+		imagePath := userStacks[email.(string)].CurrentImage.Path
+		file, err := os.Open(imagePath)
+		if err != nil {
+			log.Fatal(err)
+		}
+		img, err := imaging.Decode(file)
+		if err != nil {
+			log.Fatal(err)
+		}
+		resImg := imaging.CropCenter(img, 1600, 900)
+		err = imaging.Save(resImg, imagePath)
+		if err != nil {
+			log.Fatal(err)
+		}
+		c.JSON(http.StatusOK, gin.H{"Success": "True"})
+		file.Close()
 	} else {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Upload a image first"})
 	}
