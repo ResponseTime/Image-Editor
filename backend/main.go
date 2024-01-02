@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"main/Db"
 
 	"github.com/joho/godotenv"
 )
@@ -11,7 +12,7 @@ func main() {
 	if err != nil {
 		fmt.Println("Error loading .env file")
 	}
-	connectDb()
+	Db.ConnectDb()
 
 	router := setupRouter()
 
