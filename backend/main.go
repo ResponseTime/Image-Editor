@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"main/Db"
+	"main/Router"
 
 	"github.com/joho/godotenv"
 )
@@ -13,8 +14,7 @@ func main() {
 		fmt.Println("Error loading .env file")
 	}
 	Db.ConnectDb()
-
-	router := setupRouter()
-
+	Db.Init()
+	router := Router.SetupRouter()
 	router.Run(":8080")
 }

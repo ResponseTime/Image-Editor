@@ -33,7 +33,7 @@ type Image struct {
 }
 
 var (
-	userStacks = make(map[string]userStack)
+	userStacks = make(map[string]*userStack)
 	mu         sync.Mutex
 	client1    *mongo.Client
 )
@@ -137,7 +137,7 @@ func upload(c *gin.Context) {
 	}
 	_, exist := userStacks[email.(string)]
 	if !exist {
-		userStacks[email.(string)] = userStack{}
+		userStacks[email.(string)] = &userStack{}
 		file, err := c.FormFile("file")
 		if err != nil {
 			c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})

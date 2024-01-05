@@ -1,7 +1,5 @@
 package Models
 
-import "time"
-
 type User struct {
 	Email    string `json:"email"`
 	Password string `json:"password"`
@@ -20,5 +18,10 @@ type Result struct {
 	User        string
 	ProjectName string
 	Date        string
-	TimeCreated time.Time
+	TimeCreated string
+}
+
+type Resizer struct {
+	Height int `json:"height"`
+	Width  int `json:"width"`
 }

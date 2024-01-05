@@ -15,8 +15,6 @@ import (
 	"golang.org/x/crypto/bcrypt"
 )
 
-var Client = Db.GetClient()
-
 func CreateToken(user *Models.User) (string, error) {
 	token := jwt.New(jwt.SigningMethodHS256)
 	claims := token.Claims.(jwt.MapClaims)
@@ -64,14 +62,14 @@ func Signup(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
-	if Client == nil {
+	if Db.Client == nil {
 		log.Fatal("Connect To Database")
 	}
 	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(user.Password), 15)
 	if err != nil {
 		log.Fatal(err)
 	}
-	insertRes, err := Client.Database("users").Collection("login_details").InsertOne(context.Background(), bson.M{"email": user.Email, "password": hashedPassword})
+	insertRes, err := Db.Client.Database("users").Collection("login_details").InsertOne(context.Background(), bson.M{"email": user.Email, "password": hashedPassword})
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -86,12 +84,12 @@ func Login(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
-	if Client == nil {
+	if Db.Client == nil {
 		log.Fatal("Connect To Database")
 	}
 	var result Models.User
 	filter := bson.M{"email": user.Email}
-	err := Client.Database("users").Collection("login_details").FindOne(context.Background(), filter).Decode(&result)
+	err := Db.Client.Database("users").Collection("login_details").FindOne(context.Background(), filter).Decode(&result)
 	if err != nil {
 		fmt.Println(err)
 	}
@@ -100,7 +98,7 @@ func Login(c *gin.Context) {
 		log.Fatal(err)
 	}
 	ok := bcrypt.CompareHashAndPassword(hashedPassword, []byte(user.Password))
-	if ok == nil {
+	if ok != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "password dont match"})
 	} else {
 		tokenString, err := CreateToken(&user)

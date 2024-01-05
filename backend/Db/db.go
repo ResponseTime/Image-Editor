@@ -11,6 +11,7 @@ import (
 var (
 	client *mongo.Client
 	err    error
+	Client *mongo.Client
 )
 
 func ConnectDb() {
@@ -21,9 +22,9 @@ func ConnectDb() {
 	}
 }
 
-func GetClient() *mongo.Client {
+func Init() {
 	if err != nil {
-		return nil
+		Client = nil
 	}
-	return client
+	Client = client
 }
