@@ -66,36 +66,15 @@ func Rotate(c *gin.Context) {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to retrieve email from context"})
 		return
 	}
-	// angle, err := strconv.ParseFloat(c.PostForm("angle"), 64)
-	// if err != nil {
-	// 	log.Fatal(err)
-	// }
 	_, exist := userStacks[email.(string)]
 	if exist {
-		// imagePath := userStacks[email.(string)].CurrentImage.Path
-		// file, err := os.Open(imagePath)
-		// if err != nil {
-		// 	log.Fatal(err)
-		// }
-		// img, err := imaging.Decode(file)
-		// if err != nil {
-		// 	log.Fatal(err)
-		// }
-		// rotatedImg := imaging.Rotate(img, angle, color.Transparent)
-		// err = imaging.Save(rotatedImg, imagePath)
-		// if err != nil {
-		// 	log.Fatal(err)
-		// }
-		// c.JSON(http.StatusOK, gin.H{"Success": "True"})
-		// file.Close()
-		messi := gocv.IMRead(userStacks[email.(string)].CurrentImage.Path, gocv.IMReadColor)
-		if messi.Empty() {
+		img := gocv.IMRead(userStacks[email.(string)].CurrentImage.Path, gocv.IMReadColor)
+		if img.Empty() {
 			fmt.Printf("Failed to read image: %s\n", userStacks[email.(string)].CurrentImage.Path)
 			os.Exit(1)
 		}
 		rotated := gocv.NewMat()
-		gocv.Rotate(messi, &rotated, gocv.Rotate90Clockwise)
-
+		gocv.Rotate(img, &rotated, gocv.Rotate90Clockwise)
 		outPath := filepath.Join(userStacks[email.(string)].CurrentImage.Path)
 		if ok := gocv.IMWrite(outPath, rotated); !ok {
 			fmt.Printf("Failed to write image: %s\n")
